@@ -16,18 +16,22 @@ function getWorkHours(workType) {
     }
 }
 
+
 let totalHours = 0;
 let totalDays = 0;
+let dailyWages = []; 
+let dailyRecords = []; 
 let dailyWageMap = new Map();
 let dailyHourMap = new Map();
 let empDailyData = [];
 
+
 while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
-    let workType = Math.floor(Math.random() * 3);
+    let workType = Math.floor(Math.random() * 3); 
     let workHours = getWorkHours(workType);
     
     if (totalHours + workHours > MAX_WORKING_HOURS) {
-        workHours = MAX_WORKING_HOURS - totalHours;
+        workHours = MAX_WORKING_HOURS - totalHours; 
     }
 
     let dailyWage = workHours * WAGE_PER_HOUR;
@@ -35,7 +39,7 @@ while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
     totalDays++;
 
     dailyWageMap.set(totalDays, dailyWage);
-    dailyHourMap.set(totalDays, workHours);
+    dailyHourMap.set(totalDays, workHours); 
 
     empDailyData.push({
         day: totalDays,
@@ -44,33 +48,48 @@ while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
     });
 }
 
+
 console.log("Employee Work Data:", empDailyData);
 
-let totalWage = Array.from(dailyWageMap.values()).reduce((sum, wage) => sum + wage, 0);
-const totalWorkedHours = Array.from(dailyHourMap.values()).reduce((sum, hours) => sum + hours, 0);
+
+const totalWage = empDailyData.reduce((sum, record) => sum + record.wageEarned, 0);
+const totalWorkedHours = empDailyData.reduce((sum, record) => sum + record.hoursWorked, 0);
 console.log(`Total Wage: $${totalWage}, Total Hours Worked: ${totalWorkedHours} hrs`);
 
-console.log("Day-wise Wages:", Array.from(dailyWageMap.entries()).map(([day, wage]) => `Day ${day}: $${wage}`));
 
-const fullWorkDays = empDailyData.filter(record => record.hoursWorked === FULL_TIME_HOURS).map(record => `Day ${record.day}`);
-const partWorkDays = empDailyData.filter(record => record.hoursWorked === PART_TIME_HOURS).map(record => `Day ${record.day}`);
-const noWorkDays = empDailyData.filter(record => record.hoursWorked === 0).map(record => `Day ${record.day}`);
+console.log("Full Working Days:");
+empDailyData.forEach(record => {
+    if (record.hoursWorked === FULL_TIME_HOURS) {
+        console.log(`Day ${record.day}`);
+    }
+});
 
-console.log("Days with Full-Time Wage:", fullWorkDays);
-console.log("Days with Part-Time Wage:", partWorkDays);
-console.log("Days with No Work:", noWorkDays);
 
-let fullTimeDays = empDailyData.filter(record => record.wageEarned === FULL_TIME_WAGE);
+const partWorkDays = empDailyData
+    .filter(record => record.hoursWorked === PART_TIME_HOURS)
+    .map(record => `Day ${record.day}`);
+console.log("Part Working Days:", partWorkDays);
+
+
+const noWorkDays = empDailyData
+    .filter(record => record.hoursWorked === 0)
+    .map(record => `Day ${record.day}`);
+console.log("No Working Days:", noWorkDays);
+
+let fullTimeDays = dailyRecords.filter(record => record.wage === FULL_TIME_WAGE);
 console.log("Days with Full-Time Wage:", fullTimeDays.map(record => `Day ${record.day}`));
 
-let firstFullTimeDay = empDailyData.find(record => record.wageEarned === FULL_TIME_WAGE);
+let firstFullTimeDay = dailyRecords.find(record => record.wage === FULL_TIME_WAGE);
 console.log("First Full-Time Wage Earned On:", firstFullTimeDay ? `Day ${firstFullTimeDay.day}` : "Never");
 
-let isEveryFullTime = fullTimeDays.every(record => record.wageEarned === FULL_TIME_WAGE);
+
+let isEveryFullTime = fullTimeDays.every(record => record.wage === FULL_TIME_WAGE);
 console.log("Is Every Full-Time Wage Exactly 160?", isEveryFullTime);
 
-let hasPartTimeWage = empDailyData.some(record => record.wageEarned === PART_TIME_HOURS * WAGE_PER_HOUR);
+
+let hasPartTimeWage = dailyRecords.some(record => record.wage === PART_TIME_HOURS * WAGE_PER_HOUR);
 console.log("Is there any Part-Time Wage?", hasPartTimeWage);
 
-let daysWorked = empDailyData.filter(record => record.wageEarned > 0).length;
+
+let daysWorked = dailyRecords.filter(record => record.wage > 0).length;
 console.log(`Total Days Employee Worked: ${daysWorked}`);
