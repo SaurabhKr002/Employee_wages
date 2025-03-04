@@ -1,10 +1,7 @@
-
 const WAGE_PER_HOUR = 20;
 const FULL_TIME_HOURS = 8;
 const PART_TIME_HOURS = 4;
 
-let workType = Math.floor(Math.random() * 3);
-let workHours = 0;
 
 switch (workType) {
     case 1:
@@ -20,6 +17,10 @@ switch (workType) {
         console.log("Employee did not work");
         break;
 }
+
+let workType = Math.floor(Math.random() * 3);
+
+let workHours = getWorkHours(workType);
 
 let dailyWage = workHours * WAGE_PER_HOUR;
 console.log("Daily Wage: $" + dailyWage);
