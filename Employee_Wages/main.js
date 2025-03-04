@@ -21,6 +21,7 @@ let totalHours = 0;
 let totalDays = 0;
 let dailyWages = []; 
 let dailyRecords = []; 
+let dailyWageMap = new Map();
 
 while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
     let workType = Math.floor(Math.random() * 3); 
@@ -34,16 +35,14 @@ while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
     totalHours += workHours;
     totalDays++;
 
-    dailyWages.push(dailyWage);
-    dailyRecords.push({ day: totalDays, wage: dailyWage }); 
+    dailyWageMap.set(totalDays, dailyWage);
 }
 
 
-let totalWage = dailyWages.reduce((sum, wage) => sum + wage, 0);
+let totalWage = Array.from(dailyWageMap.values()).reduce((sum, wage) => sum + wage, 0);
 console.log(`Total Monthly Wage: $${totalWage}`);
 
-let dailyWageMap = dailyRecords.map(record => `Day ${record.day}: $${record.wage}`);
-console.log("Daily Wages with Days:", dailyWageMap);
+console.log("Day-wise Wages:", Array.from(dailyWageMap.entries()).map(([day, wage]) => `Day ${day}: $${wage}`));
 
 
 let fullTimeDays = dailyRecords.filter(record => record.wage === FULL_TIME_WAGE);
