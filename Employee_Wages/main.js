@@ -5,87 +5,56 @@ const MAX_WORKING_DAYS = 20;
 const MAX_WORKING_HOURS = 160;
 const FULL_TIME_WAGE = FULL_TIME_HOURS * WAGE_PER_HOUR;
 
-function getWorkHours(workType) {
-    switch (workType) {
-        case 1:
-            return PART_TIME_HOURS;
-        case 2:
-            return FULL_TIME_HOURS;
-        default:
-            return 0;
-    }
+// Helper function to get work hours
+const getWorkHours = (empCheck) => 
+    empCheck === 1 ? PART_TIME_HOURS : empCheck === 2 ? FULL_TIME_HOURS : 0;
+
+// Store employee daily work details as an array of objects
+let empWorkData = [];
+
+let totalEmpHours = 0;
+let totalWorkingDays = 0;
+
+// Simulate work for each day
+while (totalEmpHours <= MAX_WORKING_HOURS && totalWorkingDays < MAX_WORKING_DAYS) {
+    totalWorkingDays++;
+    let empCheck = Math.floor(Math.random() * 3); // Random 0,1,2
+    let empHours = getWorkHours(empCheck);
+    let dailyWage = empHours * WAGE_PER_HOUR;
+    totalEmpHours += empHours;
+
+    // Store in array as object
+    empWorkData.push({ day: totalWorkingDays, hoursWorked: empHours, wageEarned: dailyWage });
 }
 
-// Variables to track employee work details
-let totalHours = 0;
-let totalDays = 0;
-let empDailyData = [];
-let dailyRecords = [];
+// Calculate Total Wage using reduce helper function
+const calcTotalWage = () => empWorkData.reduce((total, day) => total + day.wageEarned, 0);
+console.log("Total Wage:", calcTotalWage());
 
-// Simulating work for the employee
-while (totalDays < MAX_WORKING_DAYS && totalHours < MAX_WORKING_HOURS) {
-    let workType = Math.floor(Math.random() * 3);
-    let workHours = getWorkHours(workType);
+// Show Days along with Daily Wage using map helper function
+const dailyWages = empWorkData.map(({ day, wageEarned }) => `Day ${day}: $${wageEarned}`);
+console.log("Daily Wages:", dailyWages);
 
-    if (totalHours + workHours > MAX_WORKING_HOURS) {
-        workHours = MAX_WORKING_HOURS - totalHours;
-    }
+// Show Days when Full-Time Wage was earned (160) using filter
+const fullTimeDays = empWorkData
+    .filter(({ wageEarned }) => wageEarned === FULL_TIME_WAGE)
+    .map(({ day }) => `Day ${day}`);
+console.log("Full Time Wage Days:", fullTimeDays);
 
-    let dailyWage = workHours * WAGE_PER_HOUR;
-    totalHours += workHours;
-    totalDays++;
+// Find First Occurrence of Full-Time Wage
+const firstFullTimeDay = empWorkData.find(({ wageEarned }) => wageEarned === FULL_TIME_WAGE);
+console.log("First Full Time Wage Earned On:", firstFullTimeDay ? `Day ${firstFullTimeDay.day}` : "None");
 
-    empDailyData.push({
-        day: totalDays,
-        hoursWorked: workHours,
-        wageEarned: dailyWage
-    });
+// Check if Every Full-Time Wage Entry is 160
+const isAllFullTimeWage = empWorkData
+    .filter(({ hoursWorked }) => hoursWorked === FULL_TIME_HOURS)
+    .every(({ wageEarned }) => wageEarned === FULL_TIME_WAGE);
+console.log("Is Every Full-Time Wage Exactly 160?", isAllFullTimeWage);
 
-    dailyRecords.push({ day: totalDays, wage: dailyWage });
-}
-
-// Display work data
-console.log("Employee Work Data:", empDailyData);
-
-// Calculate total wage and total hours worked
-const totalWage = empDailyData.reduce((sum, record) => sum + record.wageEarned, 0);
-const totalWorkedHours = empDailyData.reduce((sum, record) => sum + record.hoursWorked, 0);
-console.log(`Total Wage: $${totalWage}, Total Hours Worked: ${totalWorkedHours} hrs`);
-
-// Full Working Days
-console.log("Full Working Days:");
-empDailyData
-    .filter(record => record.hoursWorked === FULL_TIME_HOURS)
-    .forEach(record => console.log(`Day ${record.day}`));
-
-// Part-Time Working Days
-const partWorkDays = empDailyData
-    .filter(record => record.hoursWorked === PART_TIME_HOURS)
-    .map(record => `Day ${record.day}`);
-console.log("Part-Time Working Days:", partWorkDays);
-
-// No Work Days
-const noWorkDays = empDailyData
-    .filter(record => record.hoursWorked === 0)
-    .map(record => `Day ${record.day}`);
-console.log("No Working Days:", noWorkDays);
-
-// Days with Full-Time Wage
-let fullTimeDays = dailyRecords.filter(record => record.wage === FULL_TIME_WAGE);
-console.log("Days with Full-Time Wage:", fullTimeDays.map(record => `Day ${record.day}`));
-
-// First Day with Full-Time Wage
-let firstFullTimeDay = dailyRecords.find(record => record.wage === FULL_TIME_WAGE);
-console.log("First Full-Time Wage Earned On:", firstFullTimeDay ? `Day ${firstFullTimeDay.day}` : "Never");
-
-// Checking if all Full-Time Wage records are exactly 160
-let isEveryFullTime = fullTimeDays.every(record => record.wage === FULL_TIME_WAGE);
-console.log("Is Every Full-Time Wage Exactly 160?", isEveryFullTime);
-
-// Checking if there is any Part-Time Wage
-let hasPartTimeWage = dailyRecords.some(record => record.wage === PART_TIME_HOURS * WAGE_PER_HOUR);
+// Check if Any Part-Time Wage Exists
+const hasPartTimeWage = empWorkData.some(({ wageEarned }) => wageEarned === PART_TIME_HOURS * WAGE_PER_HOUR);
 console.log("Is there any Part-Time Wage?", hasPartTimeWage);
 
-// Total Days Employee Worked
-let daysWorked = dailyRecords.filter(record => record.wage > 0).length;
-console.log(`Total Days Employee Worked: ${daysWorked}`);
+// Find the Number of Days Employee Worked
+const totalDaysWorked = empWorkData.filter(({ hoursWorked }) => hoursWorked > 0).length;
+console.log("Total Days Employee Worked:", totalDaysWorked);
